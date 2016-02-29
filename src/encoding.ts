@@ -12,6 +12,7 @@ export interface Encoding {
   size?: ChannelDefWithLegend;
   shape?: ChannelDefWithLegend; // TODO: maybe distinguish ordinal-only
   detail?: FieldDef | FieldDef[];
+  tooltip?: FieldDef | FieldDef[];
   text?: FieldDef;
   label?: FieldDef;
 

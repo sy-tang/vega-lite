@@ -28,10 +28,14 @@ d3.json('examples/all-examples.json', function(examples) {
             export: false
           }
         };
-        vg.embed('.viz#'+ example + '> div.view', embedSpec, function(err) {
+        vg.embed('.viz#'+ example + '> div.view', embedSpec, function(err, result) {
           if (err) {
             console.error(err);
           }
+          if (embedSpec.spec.encoding.tooltip) {
+            result.view.on('mouseover', onMouseOver);
+            result.view.on('mouseout', onMouseOut);
+          };
         });
 
         d3.select('.viz#'+ example + '> .desc').text(vlSpec.description || '');

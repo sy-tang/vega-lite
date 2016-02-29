@@ -18,7 +18,8 @@ export enum Channel {
   DETAIL = 'detail' as any,
   LABEL = 'label' as any,
   PATH = 'path' as any,
-  ORDER = 'order' as any
+  ORDER = 'order' as any,
+  TOOLTIP = 'tooltip' as any
 }
 
 export const X = Channel.X;
@@ -33,8 +34,9 @@ export const DETAIL = Channel.DETAIL;
 export const LABEL = Channel.LABEL;
 export const PATH = Channel.PATH;
 export const ORDER = Channel.ORDER;
+export const TOOLTIP = Channel.TOOLTIP;
 
-export const CHANNELS = [X, Y, ROW, COLUMN, SIZE, SHAPE, COLOR, PATH, ORDER, TEXT, DETAIL, LABEL];
+export const CHANNELS = [X, Y, ROW, COLUMN, SIZE, SHAPE, COLOR, PATH, ORDER, TEXT, DETAIL, LABEL, TOOLTIP];
 
 export interface SupportedMark {
   point?: boolean;
@@ -75,6 +77,7 @@ export function getSupportedMark(channel: Channel): SupportedMark {
         point: true, tick: true, circle: true, square: true,
         bar: true, line: true, area: true, text: true
       };
+    case TOOLTIP:
     case SIZE:
       return {
         point: true, tick: true, circle: true, square: true,
