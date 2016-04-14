@@ -1,0 +1,50 @@
+digraph G {
+	rankdir=BT;
+
+	subgraph cluster_filter {
+		label="Filters"
+		filter
+		nullfilter
+		nonposfilter
+	}
+
+	subgraph cluster_formula {
+		label="Formula"
+		formula
+		bin
+		rank
+		bin
+		timeunit
+	}
+
+	filter -> parse
+	filter -> formula [color="lightgray"]
+	filter -> timeunit
+	filter -> aggregate
+	filter -> bin
+
+	formula -> parse
+	formula -> timeunit [color="lightgray"]
+	formula -> bin [color="lightgray"]
+	formula -> aggregate [color="lightgray"]
+
+	aggregate -> parse
+	aggregate -> filter // filtered aggregate
+	aggregate -> nullfilter // aggregate only not nulls
+	aggregate -> bin // group by bin
+	aggregate -> formula // aggregate of computed value
+
+	bin -> aggregate // bin an aggregated value
+	bin -> parse
+	bin -> formula // bin a computed value
+
+	stacking -> aggregate  // we can stack aggregates
+
+	rank -> aggregate
+	rank -> formula
+	rank -> filter
+
+	bin -> selectionfilter // bin before selection filter
+
+	nonposfilter
+}

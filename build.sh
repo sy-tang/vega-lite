@@ -1,0 +1,1 @@
+dot -Tpng deps.dot -o image.png
