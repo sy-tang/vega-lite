@@ -34,7 +34,7 @@ digraph G {
 	aggregate -> bin // group by bin
 	aggregate -> formula // aggregate of computed value
 
-	bin -> aggregate // bin an aggregated value
+	bin -> aggregate [color="lightgray"] // bin an aggregated value, ignore for now
 	bin -> parse
 	bin -> formula // bin a computed value
 
