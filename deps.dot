@@ -1,50 +1,50 @@
 digraph G {
 	rankdir=BT;
 
-	subgraph cluster_filter {
-		label="Filters"
-		filter
-		nullfilter
-		nonposfilter
-	}
+	scale [style="dashed"]
+    	marks [style="dashed"]
+	rankscale [style="dashed"]
+	raw [style="dashed"]
+	layout [style="dashed"]
 
-	subgraph cluster_formula {
-		label="Formula"
-		formula
-		bin
-		rank
-		bin
-		timeunit
-	}
+	filter -> formula  // filter computed values
 
-	filter -> parse
-	filter -> formula [color="lightgray"]
-	filter -> timeunit
-	filter -> aggregate
-	filter -> bin
+	//nonposfilter -> formula
 
-	formula -> parse
-	formula -> timeunit [color="lightgray"]
-	formula -> bin [color="lightgray"]
-	formula -> aggregate [color="lightgray"]
+	//nullfilter -> formula  // automatic nullfilter
 
-	aggregate -> parse
+	formula // formula has no dependencies
+
+	timeunit -> formula
+
 	aggregate -> filter // filtered aggregate
-	aggregate -> nullfilter // aggregate only not nulls
 	aggregate -> bin // group by bin
 	aggregate -> formula // aggregate of computed value
+	aggregate -> timeunit  // group by time unit
+	aggregate -> selectionfilter  // aggregate after filtering
 
-	bin -> aggregate [color="lightgray"] // bin an aggregated value, ignore for now
-	bin -> parse
 	bin -> formula // bin a computed value
+	bin -> filter // we want to compute bin over the filtered data to make sure we have the right bin sized
 
-	stacking -> aggregate  // we can stack aggregates
+	stacksum -> aggregate  // we can stack aggregates
+
+	marks -> aggregate
+	marks -> nullfilter
 
 	rank -> aggregate
-	rank -> formula
-	rank -> filter
+	rankscale -> rank
 
-	bin -> selectionfilter // bin before selection filter
+	selectionfilter -> bin  // selectionfilter comes after binning
+	selectionfilter -> timeunit
 
-	nonposfilter
+	scale -> nonposfilter
+
+    	// depends on either of these
+	nonposfilter -> raw [style="dashed"]
+	nonposfilter -> stacksum [style="dashed"]
+
+	aggregate -> raw
+	raw -> selectionfilter
+
+	layout -> marks  // layout can use the same things as marks
 }
