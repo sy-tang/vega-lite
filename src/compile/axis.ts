@@ -256,10 +256,10 @@ export namespace properties {
     const axis = model.axis(channel);
 
     return extend(
-      axis.axisColor !== undefined ?
+      (axis.axisColor !== undefined && !model.config().mark.filled) ?
         { stroke: {value: axis.axisColor} } :
         {},
-      axis.axisWidth !== undefined ?
+      (axis.axisWidth !== undefined && !model.config().mark.filled) ?
         { strokeWidth: {value: axis.axisWidth} } :
         {},
       axisPropsSpec || {}
@@ -298,7 +298,7 @@ export namespace properties {
     }
 
     // Label Angle
-    if (axis.labelAngle !== undefined) {
+    if (axis.labelAngle !== undefined && axis.labelAngle !== 0) {
       labelsSpec.angle = {value: axis.labelAngle};
     } else {
       // auto rotate for X and Row

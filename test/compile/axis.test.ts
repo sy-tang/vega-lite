@@ -337,6 +337,28 @@ describe('Axis', function() {
         assert.equal(axes.stroke.value, '#fff');
     });
 
+    it('tickColor should not change axis\'s ticks\'s color if mark is not fill', function() {
+        const model = parseModel({
+        mark: "area",
+        encoding: {
+          x: {field: "a", type: "quantitative", axis: {axisColor: '#123'}}
+        }
+      });
+        const axes = axis.properties.axis(model, X, {});
+        assert.equal(axes.stroke, undefined);
+    });
+
+    it('axisWidth should not display when it is not filled', function() {
+        const model = parseModel({
+        mark: "area",
+        encoding: {
+          x: {field: "a", type: "quantitative", axis: {axisWidth: 2}}
+        }
+      });
+        const axes = axis.properties.axis(model, X, {});
+        assert.deepEqual(axes.strokeWidth, undefined);
+    });
+
     it('axisWidth should change axis\'s width', function() {
         const model = parseModel({
         mark: "point",
@@ -414,6 +436,17 @@ describe('Axis', function() {
           }
         }), X, {}, null);
       assert.deepEqual(labels.text, '');
+    });
+
+    it('should not display label.angle if labelAngle is 0', function() {
+      const model = parseModel({
+        mark: "point",
+        encoding: {
+          x: {field: "a", axis:{tickLabelColor: "blue", labelAngle: 0}}
+        }
+      });
+      const labels = axis.properties.labels(model, X, {}, {});
+      assert.equal(labels.angle, undefined);
     });
 
     it('should rotate labels if labelAngle is defined', function() {
