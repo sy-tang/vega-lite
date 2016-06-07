@@ -5,15 +5,15 @@ import {FieldDef} from './fielddef';
 
 import {Config} from './config';
 import {Data} from './data';
-import {Encoding, UnitEncoding, has, isRanged} from './encoding';
+import {Encoding, UnitEncoding, has} from './encoding';
 import {Facet} from './facet';
 import {Mark} from './mark';
 import {Transform} from './transform';
 
 import {COLOR, SHAPE, ROW, COLUMN, X, Y, X2, Y2} from './channel';
 import * as vlEncoding from './encoding';
-import {TICK, RULE, BAR, AREA, ERRORBAR} from './mark';
-import {duplicate, extend, contains} from './util';
+import {BAR, AREA} from './mark';
+import {duplicate, extend} from './util';
 
 export interface BaseSpec {
   name?: string;
@@ -139,16 +139,6 @@ export function normalizeExtendedUnitSpec(spec: ExtendedUnitSpec): Spec {
 }
 
 export function normalizeUnitSpec(spec: UnitSpec): Spec {
-  if (contains([ERRORBAR], spec.mark)) {
-    return normalizeCompositeUnitSpec(spec);
-  }
-  if (isRanged(spec.encoding)) {
-    return normalizeRangedUnitSpec(spec);
-  }
-  return spec;
-}
-
-export function normalizeRangedUnitSpec(spec: UnitSpec): Spec {
   if (spec.encoding) {
     const hasX = has(spec.encoding, X);
     const hasY = has(spec.encoding, Y);
@@ -169,47 +159,6 @@ export function normalizeRangedUnitSpec(spec: UnitSpec): Spec {
     }
   }
   return spec;
-}
-
-export function normalizeCompositeUnitSpec(spec: UnitSpec): Spec {
-  let layerSpec = extend(spec.name ? {name: spec.name} : {},
-    spec.description ? {description: spec.description} : {},
-    spec.data ? {data: spec.data} : {},
-    spec.transform ? {transform: spec.transform} : {},
-    spec.config ? {config: spec.config} : {}, {layers: []}
-  );
-  if (spec.mark === ERRORBAR) {
-    const ruleSpec = {
-      mark: RULE,
-      encoding: {
-        x: duplicate(spec.encoding.x),
-        y: duplicate(spec.encoding.y),
-        x2: duplicate(spec.encoding.x2),
-        y2: duplicate(spec.encoding.y2)
-      }
-    };
-    const lowerTickSpec = {
-      mark: TICK,
-      encoding: {
-        x: duplicate(spec.encoding.x),
-        y: duplicate(spec.encoding.y),
-        size: duplicate(spec.encoding.size)
-      }
-    };
-    const upperTickSpec = {
-      mark: TICK,
-      encoding: {
-        x: spec.encoding.x2 ? duplicate(spec.encoding.x2) : duplicate(spec.encoding.x),
-        y: spec.encoding.y2 ? duplicate(spec.encoding.y2) : duplicate(spec.encoding.y),
-        size: duplicate(spec.encoding.size)
-      }
-    };
-    layerSpec.layers.push(normalizeUnitSpec(ruleSpec));
-    layerSpec.layers.push(normalizeUnitSpec(lowerTickSpec));
-    layerSpec.layers.push(normalizeUnitSpec(upperTickSpec));
-  }
-
-  return layerSpec;
 }
 
 // TODO: add vl.spec.validate & move stuff from vl.validate to here
