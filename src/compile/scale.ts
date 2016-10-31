@@ -249,18 +249,7 @@ export function domain(scale: Scale, model: Model, channel:Channel): any {
     }
     return scale.domain;
   }
-
-  // special case for temporal scale
-  if (fieldDef.type === TEMPORAL) {
-    return {
-      data: model.dataTable(),
-      field: model.field(channel),
-      sort: {
-        field: model.field(channel),
-        op: 'min'
-      }
-    };
-  }
+  
 
   // For stack, use STACKED data.
   const stack = model.stack();
@@ -313,19 +302,33 @@ export function domain(scale: Scale, model: Model, channel:Channel): any {
         ]
       };
     }
-  } else if (sort) { // have sort -- only for ordinal
-    return {
-      // If sort by aggregation of a specified sort field, we need to use SOURCE table,
-      // so we can aggregate values for the scale independently from the main aggregation.
-      data: sort.op ? SOURCE : model.dataTable(),
-      field: (fieldDef.type === ORDINAL && channel === COLOR) ? model.field(channel, {prefix: 'rank'}) : model.field(channel),
-      sort: sort
-    };
   } else {
-    return {
-      data: model.dataTable(),
-      field: (fieldDef.type === ORDINAL && channel === COLOR) ? model.field(channel, {prefix: 'rank'}) : model.field(channel),
-    };
+    if (sort) {
+      return {
+        // If sort by aggregation of a specified sort field, we need to use SOURCE table,
+        // so we can aggregate values for the scale independently from the main aggregation.
+        data: sort.op ? SOURCE : model.dataTable(),
+        field: (fieldDef.type === ORDINAL && channel === COLOR) ? model.field(channel, {prefix: 'rank'}) : model.field(channel),
+        sort: sort
+      };
+    } else {
+      // special case for temporal scale
+      if (fieldDef.type === TEMPORAL) {
+        return {
+          data: model.dataTable(),
+          field: model.field(channel),
+          sort: {
+            field: model.field(channel),
+            op: 'min'
+          }
+        };
+      } else {
+        return {
+          data: model.dataTable(),
+          field: (fieldDef.type === ORDINAL && channel === COLOR) ? model.field(channel, {prefix: 'rank'}) : model.field(channel),
+        };
+      }
+    }
   }
 }
 
