@@ -444,12 +444,15 @@ export function rangeMixins(scale: Scale, model: Model, channel: Channel): any {
 
   const fieldDef = model.fieldDef(channel);
 
-  if (isDiscreteScale(scale.type) && scale.bandSize) {
+  if (scale.bandSize && scale.bandSize !== BANDSIZE_FIT) {
     if (scale.type === ScaleType.BAND) {
       return {bandSize: scale.bandSize};
-    } else {
-      // FIXME try to fix this once we can get something to render
+    } else if (scale.type === ScaleType.POINT) {
+      delete scale.bandSize; // band size does not work with point in Vega
       return {range: [0, {data: 'layout', field: model.channelSizeName(channel)}]};
+    } else {
+      delete scale.bandSize;
+      log.warn(log.message.scalePropertyNotWorkWithType('bandSize', scale.type));
     }
   }
 

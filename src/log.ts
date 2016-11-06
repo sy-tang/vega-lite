@@ -151,6 +151,10 @@ export namespace message {
     return `Scale type "${scaleType}" does not work with mark ${mark}.`;
   }
 
+  export function scalePropertyNotWorkWithType(propName: string, scaleType: ScaleType) {
+    return `"${propName}" does not work with ${scaleType} scale.`;
+  }
+
   // AXIS
   export const INVALID_CHANNEL_FOR_AXIS = 'Invalid channel for axis.';
 
