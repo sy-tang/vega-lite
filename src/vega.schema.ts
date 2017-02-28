@@ -148,7 +148,7 @@ export interface VgFormulaTransform {
 };
 
 export interface VgLabelTransform {
-  type: 'labels';
+  type: 'label';
   ref: string;
   anchor: string;
   offset: number | string;

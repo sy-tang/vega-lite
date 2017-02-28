@@ -13,7 +13,7 @@ import {Encoding} from '../../encoding';
 
 export const label: LayoutCompiler = {
   vgMark: 'text',
-  role: undefined,
+  role: 'label',
 
   encodeEntry: (model: UnitModel) => {
     return {
@@ -32,7 +32,7 @@ export const label: LayoutCompiler = {
       const {config, encoding} = model;
       const referenceMark = model.parent.children.filter((sibling) => sibling.name === data.ref)[0];
       return {
-        type: 'labels',
+        type: 'label',
         ref: referenceMark.getName('marks'),
         anchor: anchor(encoding, config),
         offset: offset(encoding, config)
