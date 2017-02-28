@@ -3,7 +3,7 @@ import {DataComponentCompiler} from './base';
 import {autoMaxBins, Bin} from '../../bin';
 import {Channel} from '../../channel';
 import {field, FieldDef} from '../../fielddef';
-import {extend, vals, flatten, hash, isBoolean, Dict} from '../../util';
+import {extend, vals, flatten, isBoolean, Dict} from '../../util';
 import {VgTransform} from '../../vega.schema';
 import {hasDiscreteDomain} from '../../scale';
 
@@ -17,7 +17,7 @@ function numberFormatExpr(expr: string, format: string) {
 }
 
 function addRangeFormula(model: Model, transform: VgTransform[], fieldDef: FieldDef, channel: Channel) {
-  if (transform.length > 0 && transform[transform.length - 1].type === 'formula') {
+  if (transform.length > 0 && transform[transform.length - 1].type !== 'formula') {
     const hasDiscreteDomainOrHasLegend = hasDiscreteDomain(model.scale(channel).type) || model.legend(channel);
     if (hasDiscreteDomainOrHasLegend) {
       // read format from axis or legend, if there is no format then use config.numberFormat
@@ -44,7 +44,13 @@ function parse(model: Model): Dict<VgTransform[]> {
       if (!bin.maxbins && !bin.steps) {
         bin.maxbins = autoMaxBins(channel);
       }
-      const key = hash(bin) + '_' + fieldDef.field;
+      let keyFromBin = '';
+      for (const property in bin) {
+        if (bin[property]) {
+          keyFromBin += property + '_' + bin[property] + '_';
+        }
+      }
+      const key = keyFromBin + '_' + fieldDef.field;
       if (!binComponent[key]) {
         const transform: VgTransform[] = [];
         const extentSignal = model.getName(key + '_extent');
