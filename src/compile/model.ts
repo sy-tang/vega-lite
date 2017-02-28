@@ -2,7 +2,7 @@ import * as log from '../log';
 
 import {Axis} from '../axis';
 import {Channel, X, COLUMN} from '../channel';
-import {Config, CellConfig} from '../config';
+import {Config, CellConfig, ProjectionConfig} from '../config';
 import {Data, DataSourceType} from '../data';
 import {reduce, forEach} from '../encoding';
 import {FieldDef, FieldRefOption, field, isFieldDef, ChannelDef} from '../fielddef';
@@ -99,6 +99,8 @@ export abstract class Model {
   /** Name map for size, which can be renamed by a model's parent. */
   protected sizeNameMap: NameMapInterface;
 
+  protected readonly projection: ProjectionConfig;
+
   protected readonly transform: Transform;
   protected abstract readonly scales: Dict<Scale> = {};
 
@@ -129,6 +131,7 @@ export abstract class Model {
 
     this.description = spec.description;
     this.padding = spec.padding;
+    this.projection = spec.projection;
     this.transform = spec.transform;
 
     if (spec.transform) {
@@ -276,6 +279,10 @@ export abstract class Model {
 
   public renameData(oldName: string, newName: string) {
      this.dataNameMap.rename(oldName, newName);
+  }
+
+  public projection(): ProjectionConfig {
+    return this._projection;
   }
 
   /**

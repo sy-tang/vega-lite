@@ -6,6 +6,7 @@ import {MarkCompiler} from './base';
 import {area} from './area';
 import {bar} from './bar';
 import {line} from './line';
+import {path} from './path';
 import {point, circle, square} from './point';
 import {rect} from './rect';
 import {rule} from './rule';
@@ -19,6 +20,7 @@ const markCompiler: {[type: string]: MarkCompiler} = {
   area: area,
   bar: bar,
   line: line,
+  path: path,
   point: point,
   text: text,
   tick: tick,
