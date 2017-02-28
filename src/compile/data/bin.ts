@@ -16,21 +16,23 @@ function numberFormatExpr(expr: string, format: string) {
   return `format(${expr}, '${format}')`;
 }
 
-function checkDiscreteDomainOrLegend(model: Model, transform: VgTransform[], fieldDef: FieldDef, channel: Channel) {
-  const hasDiscreteDomainOrHasLegend = hasDiscreteDomain(model.scale(channel).type) || model.legend(channel);
-  if (hasDiscreteDomainOrHasLegend) {
-    // read format from axis or legend, if there is no format then use config.numberFormat
-    const format = (model.axis(channel) || model.legend(channel) || {}).format ||
-      model.config.numberFormat;
+function addRangeFormula(model: Model, transform: VgTransform[], fieldDef: FieldDef, channel: Channel) {
+  if (transform.length > 0 && transform[transform.length - 1].type === 'formula') {
+    const hasDiscreteDomainOrHasLegend = hasDiscreteDomain(model.scale(channel).type) || model.legend(channel);
+    if (hasDiscreteDomainOrHasLegend) {
+      // read format from axis or legend, if there is no format then use config.numberFormat
+      const format = (model.axis(channel) || model.legend(channel) || {}).format ||
+        model.config.numberFormat;
 
-    const startField = field(fieldDef, {datum: true, binSuffix: 'start'});
-    const endField = field(fieldDef, {datum: true, binSuffix: 'end'});
+      const startField = field(fieldDef, {datum: true, binSuffix: 'start'});
+      const endField = field(fieldDef, {datum: true, binSuffix: 'end'});
 
-    transform.push({
-      type: 'formula',
-      as: field(fieldDef, {binSuffix: 'range'}),
-      expr: `${numberFormatExpr(startField, format)} + ' - ' + ${numberFormatExpr(endField, format)}`
-    });
+      transform.push({
+        type: 'formula',
+        as: field(fieldDef, {binSuffix: 'range'}),
+        expr: `${numberFormatExpr(startField, format)} + ' - ' + ${numberFormatExpr(endField, format)}`
+      });
+    }
   }
 }
 
@@ -38,16 +40,12 @@ function parse(model: Model): Dict<VgTransform[]> {
   return model.reduceFieldDef(function(binComponent: Dict<VgTransform[]>, fieldDef: FieldDef, channel: Channel) {
     const fieldDefBin = model.fieldDef(channel).bin;
     if (fieldDefBin) {
-      // Make this bin variable always an object
-      // and extend it with maxbins if needed here.
       const bin: Bin = isBoolean(fieldDefBin) ? {} : {...fieldDefBin};
       if (!bin.maxbins && !bin.steps) {
         bin.maxbins = autoMaxBins(channel);
       }
       const key = hash(bin) + '_' + fieldDef.field;
-      if (binComponent[key]) {
-        checkDiscreteDomainOrLegend(model, binComponent[key], fieldDef, channel);
-      } else {
+      if (!binComponent[key]) {
         const transform: VgTransform[] = [];
         const extentSignal = model.getName(key + '_extent');
         const binTrans: VgTransform = {
@@ -68,10 +66,9 @@ function parse(model: Model): Dict<VgTransform[]> {
           });
         }
         transform.push(binTrans);
-
-        checkDiscreteDomainOrLegend(model, transform, fieldDef, channel);
         binComponent[key] = transform;
       }
+      addRangeFormula(model, binComponent[key], fieldDef, channel);
     }
     return binComponent;
   }, {});
